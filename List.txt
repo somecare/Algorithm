@@ -1,0 +1,358 @@
+// date:20200311 
+// author:Mao 
+
+
+
+struct ListNode
+{
+	int val;
+	ListNode *next;
+	ListNode(x):val(x),next(NULL){}
+}
+
+struct RandomListNode
+{
+	int label;
+	RandomListNode *next, *random;
+	RandomListNode(int x):label(x),next(NULL),random(NULL){}
+};
+
+bool cmp(const ListNode *a, const ListNode *b)
+{
+	return a->val < b->val;
+}
+
+
+
+// 返回列表长度
+int get_list_length(ListNode *head)
+{
+	int len = 0;
+	while(head)
+	{
+		len++;
+		head = head->next;
+	}
+	return len;
+}
+
+ListNode *forward_long_list(int long_len, int short_len, ListNode *head)
+{
+	int delta = long_len - short_len;
+	while(delta)
+	{
+		head = head->next;
+		delta--;
+	}
+	return head;
+}
+
+
+class Solution()
+{
+public:
+
+    //  逆转 列表第m-n之间的元素
+	ListNode *reverseBetween(ListNode* head, int m, int n)
+	{
+		int charge_len = n - m + 1;// 需要逆置个数
+		ListNode *pre_head = NULL; // 初始化开始逆置节点的前驱
+		ListNode *result = head;   // 结果
+		while(head && --m)
+		{
+			pre_head = head;
+			head = head->next;
+		}
+		ListNode *modify_list_tail = head;  // 逆置后的链表尾部
+		ListNode *new_head = NULL;
+		while(head && charge_len)
+		{
+			ListNode* next = head->next;
+			head->next = new_head;
+			new_head = head;
+			head = next;
+			charge_len--;
+		}
+		modify_list_tail->next = head;
+		if(pre_head != null)
+		{
+			pre_head->next = new_head;
+		}
+		else
+		{
+			result = new_head;  // pre_head为空，表示从头开始逆置
+		}
+		return result;
+		
+	}
+	
+	// 求两个链表之间的交点（无环，不能破坏传入列表结构，时间复杂度O(n)，空间复杂度(O(1))）
+	// 利用set集合求解
+	
+	ListNode* getIntersectionNode(ListNode *headA, ListNode *headB)
+	{
+		std::set<ListNode*> node_set;
+		while(headA)
+		{
+			node_set.insert(headA);
+			headA = headA->next;
+		}
+		while(headB)
+		{
+			if(node_set.find(headB) != node_set.end())
+			{
+				return headB;
+			}
+			headB = headB.next;
+		}
+		return NULL;
+	}
+	// 利用链表特性
+	ListNode* getIntersectionNode(ListNode *headA, ListNode *headB)
+	{
+		int listA_len = get_list_length(headA);
+		int listB_len = get_list_length(headB);
+		if(listA_len > listB_len)
+		{
+			headA = forward_long_list(listA_len,listB_len,headA);
+		}
+		else
+		{
+			headB = forward_long_list(listB_len,listA_len,headB);
+		}
+		while(headA && headB)
+		{
+			if(headA == headB)
+			{
+				return headA;
+			}
+			headA = headA->next;
+			headB = headB->next;
+		}
+		return NULL:
+	}
+	// 链表求环
+	// 参考set集合
+	ListNode *detectCycle(ListNode *head)
+	{
+		std::set<ListNode*>node_set;
+		while(head)
+		{
+			if(node_set.find(head) != node_set.end())
+			{
+				return head;
+			}
+			node_set.insert(head);
+			head = head->next;
+		}
+		return NULL;
+	}
+	// 快慢指针
+	ListNode* detectCycle(ListNode *head)
+	{
+		ListNode* fast = head;
+		ListNode* slow = head;
+		ListNode* meet = NULL; // 所求节点
+		while(fast)
+		{
+			fast = fast->next;
+			slow = slow->next;
+			if(!fast)
+			{
+				return NULL;
+			}
+			fast = fast->next;
+			if(fast == slow)
+			{
+				meet = fast;
+				break;
+			}
+		}
+		if(meet == NULL)
+		{
+			return NULL;
+		}
+		while(head && meet)
+		{
+			if(head == meet)
+			{
+				return head;
+			}
+			head = head->next;
+			meet = meet->next;
+		}
+		return NULL;
+	}
+	
+	// 链表划分 ：已知头指针head与数值x，将所有小于X的节点放在大于或者等于x的节点前，保持这些节点原来的位置
+	// 临时链表
+	ListNode *partition(ListNode* head, intx)
+	{
+		ListNode less_head(0);
+		ListNode more_head(0);
+		ListNode *less_ptr = &less_head;
+		ListNode *more_ptr = &more_head;
+		while(head)
+		{
+			if(head->val < x)
+			{
+				less_ptr->next = head;
+				less_ptr = head;
+			}
+			else
+			{
+				more_ptr->next = head;
+				more_ptr = head;
+			}
+			head = head->next;
+		}
+		less_ptr->next = more_head.next;
+		more_ptr->next = NULL;
+		return less_head.next;
+	}
+	
+	// 对复杂链表(节点中有一个指向本链表任意节点的随机指针，也可以为空)，进行深度拷贝
+	RandomListNode* copyRandomList(RandomListNode* head)
+	{
+		std::map<RandomListNode *,int> node_map; // 存储索引
+		std:vector<RandomListNode*> node_vec;	 // 存储节点
+		RandomListNode *ptr = head;
+		int i = 0;
+		while(ptr)
+		{
+			node_vec.push_back(new RandomListNode(ptr->label));
+			node_map[ptr] = i;
+			ptr = ptr->next;
+			i++;
+		}
+		node_vec.push_back(0);
+		ptr = head;
+		i = 0;
+		while(ptr)
+		{
+			node_vec[i]->next = node_vec[i+1];
+			if(ptr->random)
+			{
+				int id = node_map[ptr->random];   // 找到random索引
+				node_vec[i]->random = node_vec[id];
+			}
+			ptr = ptr->next;
+			i++;
+		}
+		return node_vec[0];
+	}
+	
+	// 有序链表1和链表2，将两个链表合并，合并后的链表仍然有序，返回合并的头节点
+	
+	ListNode *mergeTwoLists(ListNode* l1,ListNode *l2)
+	{
+		ListNode temp_head(0);
+		ListNode *ptr = &temp_head;
+		while(l1 && l2)
+		{
+			if(l1->val < l2->val)
+			{
+				ptr->next = l1;
+				l1 = l1->next;
+			}
+			else
+			{
+				ptr->next = l2;
+				l2 = l2->next;
+			}
+			ptr = ptr->next;
+		}
+		if(l1)
+		{
+			ptr->next = l1;
+		}
+		if(l2)
+		{
+			ptr->next = l2;
+		}
+		return temp_head.next;
+	}
+	// 有序链表k个，将k个链表合并，合并后的链表仍然有序，返回其头节点
+	ListNode* mergeKLists(std::vector<ListNode *>& lists)
+	{
+		std::vector<ListNode *>node_vec;
+		for(int i = 0;i < lists.size();i++)
+		{
+			ListNode *head = lists[i];
+			while(head)
+			{
+				node_vec.push_back(head);
+				head = head->next;
+			}
+		}
+		if(node_vec.size() == NULL)
+		{
+			return NULL;
+		}
+		std::sort(node_vec.begin(),node_vec.end(),cmp);
+		for(int i = 1;i < node_vec.size();i++)
+		{
+			node_vec[i-1].next = node_vec[i];
+ 		}
+		node_vec[node_vec.size()-1].next = NULL;
+		return node_vec[0];
+	}
+	// k个有序链表合并2：分治法,递归
+	ListNode *mergeKLists(std::vector<ListNode *>&lists)
+	{
+		if(lists.size() == 0)
+		{
+			return NULL;
+		}
+		if(lists.size() == 1)
+		{
+			return lists[0];
+		}
+		if(lists.size() == 2)
+		{
+			return mergeTwoLists(lists[0],lists[1]);
+		}
+		int mid = lists.size()/2;
+		std::vector<ListNode*> sub1_lists;
+		std::vector<ListNode*> sub2_lists;
+		for(int i = 0;i < mid;i++)
+		{
+			sub1_lists.push_back(lists[i]);
+		}
+		for(i = mid;i < lists.size();i++)
+		{
+			sub2_lists.push_back(lists[i]);
+		}
+		ListNode* l1 = mergeKLists(sub1_lists);
+		ListNode* l2 = mergeKLists(sub2_lists);
+		return mergeTwoLists(l1,l2);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
