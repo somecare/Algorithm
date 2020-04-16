@@ -4,7 +4,7 @@
 */
 #include"List.h"
 
-
+/*
 // 反转列表，不用额外空间
 class Solution{
 public:
@@ -58,7 +58,8 @@ public:
 
 	}
 };
-
+*/
+/*
 int main()
 {
 	ListNode a(1);
@@ -73,7 +74,7 @@ int main()
 	d.next = &e;
 	e.next = &f;
 	Solution solve;
-	/*
+	
 	// 测试reverseList
 	ListNode *head = &a;
 	cout << "Before reverse:" << endl;
@@ -91,7 +92,7 @@ int main()
 		head = head->next;
 	}
 	cout << "NULL" << endl;
-	*/
+	
 	cout << "******--****--******" << endl;
 	cout << "翻转指定区间节点" << endl;
 	ListNode *head = &a;
@@ -114,6 +115,6 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-
+*/
 
 
